@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#24599B">
 <title>KD STYLE 35</title>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -47,7 +47,15 @@ html,body{background:var(--bg)}body{font-family:Arial,"Hiragino Kaku Gothic ProN
 .cloud-panel{border:2px solid var(--blue);padding:19px;margin:18px 0 30px;background:#fffdf6}.cloud-title{font-size:20px;font-weight:900;color:var(--blue);margin-bottom:9px}.cloud-title span{color:#d7b41c}.cloud-panel p,.cloud-panel #cloudStatus{font-size:12px;line-height:1.8;color:var(--sub)}.cloud-auth-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.cloud-auth-row input{width:100%;padding:11px;border:1px solid #bbb;border-radius:3px;font-size:15px}.cloud-auth-row button,.cloud-button{background:var(--blue);color:var(--yellow);font-weight:900;border:0;padding:11px 15px;border-radius:3px;cursor:pointer}.cloud-button.secondary{background:var(--yellow);color:var(--blue)}.cloud-gallery{margin-top:34px}.cloud-album{border-top:1px solid #c9c7c0;padding:16px 0}.cloud-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.cloud-photos img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee;cursor:pointer}.cloud-photo-pick{width:100%;font-size:13px;margin:15px 0}.cloud-hint{font-size:12px;color:var(--sub);line-height:1.7}.cloud-album-name{font-size:18px;font-weight:900;color:var(--blue)}
 
 .local-gallery{margin:35px 0 20px}.local-gallery h2{font-size:19px;font-weight:900;color:var(--blue)}.local-album{padding:18px 0;border-top:1px solid #c9c7c0}.local-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.local-photos img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:3px;background:#e8e6df;cursor:pointer}.local-photo-note{font-size:12px;line-height:1.7;color:var(--sub)}.local-upload{width:100%;padding:12px 0}.local-button{background:var(--blue);color:var(--yellow);font-weight:900;border:0;border-radius:3px;padding:12px 14px;margin-right:8px}.local-button:disabled{opacity:.5}
+.category-add{display:block;width:100%;padding:17px;margin:20px 0 8px;border:1px dashed var(--blue);border-radius:8px;background:transparent;color:var(--blue);font-weight:800;text-align:center;letter-spacing:.05em}.category-add:active{background:#e7eefa}
+.category-delete{border:1px solid #c9c7c0;background:transparent;border-radius:50%;color:#777;font-size:18px;line-height:1;width:30px;height:30px;min-width:30px;cursor:pointer;margin-left:auto}.category-delete:active{background:#eee;color:#222}
+.wish-category-manager{margin:12px 0;padding:12px;border:1px solid #d6d2c9;border-radius:8px}.wish-manage-heading{font-weight:800;color:var(--blue);font-size:13px;margin-bottom:8px}.wish-manage-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #e7e4dc}.wish-manage-row:last-child{border-bottom:0}.wish-manage-row .category-delete{margin-left:auto}
 </style>
+<script>
+// Prevent accidental pinch zoom in the installed iPhone app while preserving normal scrolling.
+document.addEventListener('gesturestart', event => event.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', event => event.preventDefault(), {passive:false});
+</script>
 </head>
 <body>
 <div class="shell">
@@ -55,6 +63,7 @@ html,body{background:var(--bg)}body{font-family:Arial,"Hiragino Kaku Gothic ProN
 <main>
 <section class="view active" id="home">
 <div class="cover"><div class="cover-meta"><span>THE PERSONAL LIFE MAGAZINE</span><span>EST. 2026</span></div><div class="cover-logo"><span class="cover-kd">KD STYLE</span><span class="cover-35">35.</span></div><div class="cover-foot"><span>MAKE YOUR OWN STORY.</span><span class="issue">VOL. 035</span></div></div><div class="hero"><div class="eyebrow muted">UNTIL 35</div><div class="count" id="count">—</div><div class="remaining">DAYS REMAINING</div><button class="birth-button" id="birthdayButton">35歳の誕生日を設定</button><div class="quote" id="quote"></div></div>
+<div class="section-head"><div><div class="section-title">TODAY'S SCHEDULE</div><div class="hint">CALENDARに登録した今日の予定を時間順に表示</div></div></div><div class="list" id="homeScheduleList"></div>
 <div class="section-head"><div><div class="section-title">TODAY'S TODO</div><div class="hint" id="todayDate"></div></div><button class="plus" data-add="todo" data-today="true" aria-label="今日のTODOを追加">+</button></div>
 <p class="hint">CALENDARの今日のTODOと連動。毎日の習慣は下の設定から登録できます。</p><div class="list" id="todayList"></div><div class="section-head" style="margin-top:25px"><div class="section-title">DAILY HABITS</div><button class="plus" id="addHabit" aria-label="毎日の習慣を追加">+</button></div><p class="hint">毎日自動で表示する習慣を管理します。チェックは日付ごとに記録されます。</p><div class="list" id="habitList"></div>
 </section>
@@ -64,7 +73,7 @@ html,body{background:var(--bg)}body{font-family:Arial,"Hiragino Kaku Gothic ProN
 <p class="hint">日付を選んで、下の＋から予定を登録できます。登録した予定は日付にドットで表示されます。</p><div class="section-head"><div class="section-title">SCHEDULE</div><button class="plus" data-add="schedule" aria-label="予定を追加">+</button></div><div class="list" id="scheduleList"></div>
 <div class="section-head" style="margin-top:36px"><div class="section-title">TODO</div><button class="plus" data-add="todo" aria-label="TODOを追加">+</button></div><div class="list" id="calendarTodoList"></div>
 </section>
-<section class="view" id="styleView"><div class="page-kicker">03 / THE INDEX</div><h1 class="view-title">MY STYLE</h1><div id="styleCategories"></div></section>
+<section class="view" id="styleView"><div class="page-kicker">03 / THE INDEX</div><h1 class="view-title">MY STYLE</h1><div id="styleCategories"></div><button class="category-add" id="addStyleCategory" type="button">＋ カテゴリーを追加</button></section>
 <section class="view" id="wishlistView"><div class="page-kicker">04 / THE COLLECTION</div><div class="section-head" style="margin-top:0"><h1 class="view-title" style="margin:0">WISHLIST</h1><button class="plus" data-add="wishlist" aria-label="欲しいものを追加">+</button></div><p class="hint" style="margin-bottom:30px">本当に欲しいものだけを選ぶ、30日間のリスト。</p><div id="wishlistCategories"></div></section>
 <section class="view" id="musicView"><button class="archive-back" data-back-style>← STYLEへ戻る</button><div class="page-kicker">05 / SOUNDTRACK OF MY LIFE</div><div class="section-head" style="margin-top:0"><h1 class="view-title" style="margin:0">MUSIC.</h1><button class="plus" data-add="music" aria-label="音楽を記録">+</button></div><p class="hint" style="margin-bottom:26px">SOUNDTRACK OF MY LIFE<br>その頃の自分を、音楽で思い出す。</p><div id="musicList"></div></section>
 
@@ -90,7 +99,7 @@ function todayKey(){return dateKey(new Date())}
 function dayDiff(start,end){const a=fromKey(start),b=fromKey(end);return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000)}
 function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()}
 function readData(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&typeof v==='object'?v:{}}catch{return {}}}
-const data=readData();data.todos??={};data.schedules??={};data.goals??=structuredClone(STYLE);data.wishlist??=[];data.music??=[];data.birthday??='';data.weeklyTodos??=null;data.weeklyChecks??={};data.dailyHabits??=null;data.skippedHabits??={};
+const data=readData();data.todos??={};data.schedules??={};data.goals??=structuredClone(STYLE);data.wishlist??=[];data.music??=[];data.birthday??='';data.weeklyTodos??=null;data.weeklyChecks??={};data.dailyHabits??=null;data.skippedHabits??={};data.styleCategories??=[];data.wishCategories??=[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch{alert('保存できませんでした。ブラウザの保存設定を確認してください。')}}
 let selected=todayKey(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 function ensureHabits(){
@@ -116,35 +125,107 @@ function ensureTodos(key){
 }
 function node(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function empty(container,message){container.append(node('div','empty',message))}
-function renderTodos(container,key){container.replaceChildren();const items=ensureTodos(key);if(!items.length){empty(container,'TODOはありません');return}items.forEach(item=>{const row=node('div','item');const input=node('input','todo-check');input.type='checkbox';input.checked=!!item.done;input.setAttribute('aria-label',item.text);input.addEventListener('change',()=>{item.done=input.checked;save();renderAll()});const label=node('span','todo-text'+(item.done?' done-text':''),item.text);const del=node('button','delete-mini','×');del.setAttribute('aria-label','TODOを削除');del.onclick=()=>{if(confirm('このTODOを削除しますか？')){if(item.habitId)(data.skippedHabits[key]??=[]).push(item.habitId);data.todos[key]=items.filter(x=>x.id!==item.id);save();renderAll()}};row.append(input,label,del);container.append(row)})}
+function renderTodos(container,key){container.replaceChildren();const items=ensureTodos(key);if(!items.length){empty(container,'TODOはありません');return}items.forEach(item=>{const row=node('div','item');const input=node('input','todo-check');input.type='checkbox';input.checked=!!item.done;input.setAttribute('aria-label',item.text);input.addEventListener('change',()=>{item.done=input.checked;save();renderAll()});const label=node('span','todo-text'+(item.done?' done-text':''),item.text);const del=node('button','delete-mini','×');del.setAttribute('aria-label','TODOを削除');del.onclick=()=>{{if(item.habitId)(data.skippedHabits[key]??=[]).push(item.habitId);data.todos[key]=items.filter(x=>x.id!==item.id);save();renderAll()}};row.append(input,label,del);container.append(row)})}
 function renderHabits(){
  const box=el('habitList');box.replaceChildren();const habits=ensureHabits();
  if(!habits.length){empty(box,'習慣はまだありません。＋から登録できます。');return}
- for(const habit of habits){const row=node('div','item');row.append(node('span','todo-text',habit.text));const del=node('button','delete-mini','×');del.setAttribute('aria-label','毎日の習慣を解除');del.onclick=()=>{if(!confirm('この習慣の繰り返し登録を解除しますか？過去のチェック記録は残ります。'))return;data.dailyHabits=data.dailyHabits.filter(x=>x.id!==habit.id);save();renderAll()};row.append(del);box.append(row)}
+ for(const habit of habits){const row=node('div','item');row.append(node('span','todo-text',habit.text));const del=node('button','delete-mini','×');del.setAttribute('aria-label','毎日の習慣を解除');del.onclick=()=>{data.dailyHabits=data.dailyHabits.filter(x=>x.id!==habit.id);save();renderAll()};row.append(del);box.append(row)}
 }
 function addHabit(){openModal('毎日の習慣を追加');const input=field('毎日続けたいこと');input.placeholder='例：朝の散歩';buttons(()=>{const text=input.value.trim();if(!text)return input.focus();if(ensureHabits().some(x=>x.text===text)){alert('同じ習慣がすでにあります');return}data.dailyHabits.push({id:uid(),text});save();closeModal();renderAll()});input.focus()}
+function renderHomeSchedules(key){
+ const box=el('homeScheduleList');box.replaceChildren();
+ const items=(data.schedules[key]||[]).slice().sort((a,b)=>!a.time&&!b.time?0:!a.time?-1:!b.time?1:a.time.localeCompare(b.time));
+ if(!items.length){empty(box,'今日の予定はありません');return}
+ items.forEach(item=>{
+  const row=node('div','item schedule-row');
+  row.append(node('span','schedule-time',item.time||'終日'),node('span','todo-text',item.text));
+  row.title='タップして予定を編集';
+  row.setAttribute('role','button');row.tabIndex=0;
+  const edit=()=>{selected=key;openScheduleEdit(item)};
+  row.onclick=edit;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();edit()}};
+  box.append(row)
+ })
+}
 function renderHome(){
- const now=todayKey();el('todayDate').textContent=fromKey(now).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+ const now=todayKey();renderHomeSchedules(now);el('todayDate').textContent=fromKey(now).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
  renderTodos(el('todayList'),now);renderHabits();
  if(data.birthday&&/^\d{4}-\d{2}-\d{2}$/.test(data.birthday)){const days=Math.max(0,dayDiff(now,data.birthday));el('count').textContent=days.toLocaleString('ja-JP');el('headerCountdown').textContent=`${days} DAYS`;el('birthdayButton').textContent='35歳の誕生日を変更'}else{el('count').textContent='—';el('headerCountdown').textContent='YOUR DAILY JOURNEY';el('birthdayButton').textContent='35歳の誕生日を設定'}const n=Math.floor(Date.UTC(...now.split('-').map((x,i)=>i===1?Number(x)-1:Number(x)))/86400000);el('quote').textContent=QUOTES[((n%QUOTES.length)+QUOTES.length)%QUOTES.length]
 }
 // 2026年の国民の祝日と振替休日・国民の休日
 const HOLIDAYS_2026={'2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日'};
 function renderCalendar(){el('monthTitle').textContent=`${month.getFullYear()} / ${pad(month.getMonth()+1)}`;const grid=el('calendar');grid.replaceChildren();['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach((w,i)=>grid.append(node('div','weekday'+(i===0?' sun':''),w)));const offset=new Date(month.getFullYear(),month.getMonth(),1).getDay();for(let i=0;i<offset;i++)grid.append(node('div'));const length=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();for(let d=1;d<=length;d++){const dt=new Date(month.getFullYear(),month.getMonth(),d),key=dateKey(dt),holiday=HOLIDAYS_2026[key];const has=(data.schedules[key]?.length||0)>0||(data.todos[key]?.some(t=>t.done)||false);const btn=node('button','day'+(dt.getDay()===0?' sun':'')+(holiday?' holiday':'')+(key===todayKey()?' today':'')+(key===selected?' selected':'')+(has?' dot':''),String(d));btn.title=holiday||key;btn.setAttribute('aria-label',key+(holiday?' '+holiday:''));btn.onclick=()=>{selected=key;renderCalendar()};grid.append(btn)}el('selectedDateTitle').textContent=fromKey(selected).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});renderSchedules();renderTodos(el('calendarTodoList'),selected)}
-function renderSchedules(){const box=el('scheduleList');box.replaceChildren();const items=data.schedules[selected]||[];if(!items.length){empty(box,'予定はありません');return}items.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(item=>{const row=node('div','item schedule-row');row.append(node('span','schedule-time',item.time||'—'),node('span','todo-text',item.text));row.title='クリックして編集';row.onclick=()=>openScheduleEdit(item);box.append(row)})}
-function openScheduleEdit(item){openModal('予定を編集');const time=field('時間','time'),input=field('予定内容');time.value=item.time||'';input.value=item.text;buttons(()=>{if(!time.value)return time.focus();if(!input.value.trim())return input.focus();item.time=time.value;item.text=input.value.trim();save();closeModal();renderAll()},'保存');const del=node('button','action danger','削除');del.onclick=()=>{if(confirm('この予定を削除しますか？')){data.schedules[selected]=(data.schedules[selected]||[]).filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(del)}
+function renderSchedules(){const box=el('scheduleList');box.replaceChildren();const items=data.schedules[selected]||[];if(!items.length){empty(box,'予定はありません');return}items.slice().sort((a,b)=>!a.time&&!b.time?0:!a.time?-1:!b.time?1:a.time.localeCompare(b.time)).forEach(item=>{const row=node('div','item schedule-row');row.append(node('span','schedule-time',item.time||'終日'),node('span','todo-text',item.text));row.title='クリックして編集';row.onclick=()=>openScheduleEdit(item);box.append(row)})}
+function openScheduleEdit(item){openModal('予定を編集');const time=field('時間（任意・空欄なら終日）','time'),input=field('予定内容');time.required=false;time.value=item.time||'';input.value=item.text;buttons(()=>{if(!input.value.trim())return input.focus();item.time=time.value;item.text=input.value.trim();save();closeModal();renderAll()},'保存');const del=node('button','action danger','削除');del.onclick=()=>{{data.schedules[selected]=(data.schedules[selected]||[]).filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(del)}
 function musicFields(item){const song=field('曲名'),artist=field('アーティスト'),date=field('記録する日','date');song.value=item?.song||'';artist.value=item?.artist||'';date.value=item?.date||todayKey();const wrap=node('label','field','その頃の気分・思い出（任意）'),note=node('textarea');note.value=item?.note||'';note.placeholder='例：朝の散歩で何度も聴いていた';wrap.append(note);el('modalContent').append(wrap);const link=field('音楽へのリンク（任意）','url');link.required=false;link.value=item?.link||'';link.placeholder='https://...';return {song,artist,date,note,link}}
-function openMusic(item){openModal(item?'音楽の記録を編集':'音楽を記録');const f=musicFields(item);buttons(()=>{if(!f.song.value.trim())return f.song.focus();if(!f.artist.value.trim())return f.artist.focus();if(!f.date.value)return f.date.focus();const record={id:item?.id||uid(),song:f.song.value.trim(),artist:f.artist.value.trim(),date:f.date.value,note:f.note.value.trim(),link:f.link.value.trim()};if(item){const idx=data.music.findIndex(x=>x.id===item.id);if(idx>=0)data.music[idx]=record}else data.music.push(record);save();closeModal();renderAll()},item?'保存':'追加');if(item){const del=node('button','action danger','削除');del.onclick=()=>{if(confirm('この音楽の記録を削除しますか？')){data.music=data.music.filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(del)}f.song.focus()}
+function openMusic(item){openModal(item?'音楽の記録を編集':'音楽を記録');const f=musicFields(item);buttons(()=>{if(!f.song.value.trim())return f.song.focus();if(!f.artist.value.trim())return f.artist.focus();if(!f.date.value)return f.date.focus();const record={id:item?.id||uid(),song:f.song.value.trim(),artist:f.artist.value.trim(),date:f.date.value,note:f.note.value.trim(),link:f.link.value.trim()};if(item){const idx=data.music.findIndex(x=>x.id===item.id);if(idx>=0)data.music[idx]=record}else data.music.push(record);save();closeModal();renderAll()},item?'保存':'追加');if(item){const del=node('button','action danger','削除');del.onclick=()=>{{data.music=data.music.filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(del)}f.song.focus()}
 function renderMusic(){const box=el('musicList');box.replaceChildren();const records=[...data.music].sort((a,b)=>b.date.localeCompare(a.date));if(!records.length){empty(box,'まだ音楽の記録はありません。＋から好きな曲を残しましょう。');return}let previous='';records.forEach(item=>{const month=item.date.slice(0,7);if(month!==previous){previous=month;const heading=node('div','section-title',month.replace('-',' / '));heading.style.marginTop='28px';box.append(heading)}const row=node('article','music-entry');row.append(node('div','music-date',item.date.replaceAll('-','.')),node('div','music-song',item.song),node('div','music-artist',item.artist));if(item.note)row.append(node('p','music-note',item.note));const actions=node('div','music-actions'),edit=node('button','','編集');edit.onclick=()=>openMusic(item);actions.append(edit);if(item.link&&/^https?:\/\//i.test(item.link)){const link=node('a','','曲を開く ↗');link.href=item.link;link.target='_blank';link.rel='noopener noreferrer';actions.append(link)}row.append(actions);box.append(row)})}
-function renderStyle(){const box=el('styleCategories');box.replaceChildren();Object.keys(STYLE).forEach(cat=>{const section=node('section','category'),head=node('div','category-top'),title=node('div','category-name',cat),plus=node('button','plus','+');plus.setAttribute('aria-label',`${cat}に目標を追加`);plus.onclick=()=>openAdd('goal',cat);head.append(title,plus);section.append(head);(data.goals[cat]||[]).forEach(goal=>{const row=node('div','goal');row.append(node('span','',goal));section.append(row)});box.append(section)})}
-function renderWishlist(){const box=el('wishlistCategories');box.replaceChildren();let any=false;WISH_CATEGORIES.forEach(cat=>{const items=data.wishlist.filter(x=>x.category===cat);if(!items.length)return;any=true;const section=node('section','category');section.append(node('div','category-name',cat));items.forEach(item=>{const btn=node('button','wish-row');btn.append(node('div','wish-name','○ '+item.name),node('div','wish-meta',`WANTED ${item.created.replaceAll('-','.')} · ${Math.max(0,dayDiff(item.created,todayKey()))} DAYS`));btn.onclick=()=>openWishDetail(item);section.append(btn)});box.append(section)});if(!any)empty(box,'欲しいものはまだありません。＋から追加しましょう。')}
+function styleCategoryNames(){return [...new Set([...Object.keys(STYLE),...data.styleCategories,...Object.keys(data.goals)])]}
+function wishCategoryNames(){return [...new Set([...WISH_CATEGORIES,...data.wishCategories,...data.wishlist.map(x=>x.category).filter(Boolean)])]}
+function addCategory(kind){
+ const isStyle=kind==='style',existing=isStyle?styleCategoryNames():wishCategoryNames();
+ openModal(isStyle?'STYLEのカテゴリーを追加':'WISHLISTのカテゴリーを追加');
+ const input=field('カテゴリー名');input.placeholder=isStyle?'例：TRAVEL':'例：INTERIOR';input.maxLength=32;
+ const error=node('div','hint','');el('modalContent').append(error);
+ const submit=()=>{const name=input.value.trim().replace(/\\s+/g,' ').toUpperCase();if(!name){input.focus();return}
+ if(existing.some(x=>x.toUpperCase()===name)){error.textContent='同じ名前のカテゴリーがすでにあります。';input.focus();return}
+ if(isStyle){data.styleCategories.push(name);data.goals[name]=[]}else{data.wishCategories.push(name)}
+ save();closeModal();renderAll()};
+ buttons(submit);input.onkeydown=e=>{if(e.key==='Enter')submit()};input.focus();
+}
+function deleteCustomCategory(kind,cat){
+ if(kind==='style'){
+  if(!data.styleCategories.includes(cat))return;
+  const goals=data.goals[cat]||[];
+  if(goals.length){
+   const target='UNCATEGORIZED';
+   if(!data.styleCategories.includes(target)&&!Object.hasOwn(STYLE,target))data.styleCategories.push(target);
+   (data.goals[target]??=[]).push(...goals);
+  }
+  delete data.goals[cat];
+  data.styleCategories=data.styleCategories.filter(c=>c!==cat);
+ }else{
+  if(!data.wishCategories.includes(cat))return;
+  data.wishlist.forEach(item=>{if(item.category===cat)item.category='LIFE'});
+  data.wishCategories=data.wishCategories.filter(c=>c!==cat);
+ }
+ save();renderAll();
+}
+function categoryDeleteButton(kind,cat){
+ const b=node('button','category-delete','×');
+ b.type='button';b.title=cat+'カテゴリーを削除';b.setAttribute('aria-label',cat+'カテゴリーを削除');
+ b.onclick=()=>deleteCustomCategory(kind,cat);
+ return b;
+}
+function renderStyle(){const box=el('styleCategories');box.replaceChildren();styleCategoryNames().forEach(cat=>{const section=node('section','category'),head=node('div','category-top'),title=node('div','category-name',cat),plus=node('button','plus','+');plus.setAttribute('aria-label',`${cat}に目標を追加`);plus.onclick=()=>openAdd('goal',cat);head.append(title);if(data.styleCategories.includes(cat)&&cat!=='UNCATEGORIZED')head.append(categoryDeleteButton('style',cat));head.append(plus);section.append(head);(data.goals[cat]||[]).forEach(goal=>{const row=node('div','goal');row.append(node('span','',goal));section.append(row)});box.append(section)})}
+function renderWishlist(){const box=el('wishlistCategories');box.replaceChildren();let any=false;wishCategoryNames().forEach(cat=>{const items=data.wishlist.filter(x=>x.category===cat);const custom=data.wishCategories.includes(cat);if(!items.length&&!custom)return;any=true;const section=node('section','category');const head=node('div','category-top');head.append(node('div','category-name',cat));section.append(head);items.forEach(item=>{const btn=node('button','wish-row');btn.append(node('div','wish-name','○ '+item.name),node('div','wish-meta',`WANTED ${item.created.replaceAll('-','.')} · ${Math.max(0,dayDiff(item.created,todayKey()))} DAYS`));btn.onclick=()=>openWishDetail(item);section.append(btn)});if(!items.length)section.append(node('div','hint','まだ登録はありません'));box.append(section)});if(!any)empty(box,'欲しいものはまだありません。＋から追加しましょう。')}
 function renderAll(){renderHome();renderCalendar();renderStyle();renderWishlist();renderMusic()}
 function closeModal(){el('overlay').hidden=true;el('modalContent').replaceChildren();el('modalActions').replaceChildren()}
 function openModal(title){el('modalTitle').textContent=title;el('modalContent').replaceChildren();el('modalActions').replaceChildren();el('overlay').hidden=false}
 function field(label,type='text'){const wrap=node('label','field',label),input=node('input');input.type=type;input.required=true;wrap.append(input);el('modalContent').append(wrap);return input}
 function buttons(onSubmit,submitLabel='追加'){const cancel=node('button','action','キャンセル'),submit=node('button','action primary',submitLabel);cancel.onclick=closeModal;submit.onclick=onSubmit;el('modalActions').append(cancel,submit)}
-function openAdd(kind,cat){if(kind==='todo'){const key=cat||selected;openModal('TODOを追加');const input=field('やること');input.placeholder='例：写真を整理する';buttons(()=>{const text=input.value.trim();if(!text)return input.focus();ensureTodos(key).push({id:uid(),text,done:false});save();closeModal();renderAll()});input.focus();input.onkeydown=e=>{if(e.key==='Enter')el('modalActions').lastElementChild.click()}}else if(kind==='schedule'){openModal('SCHEDULEを追加');const time=field('時間','time'),input=field('予定内容');input.placeholder='例：家族で公園';buttons(()=>{const text=input.value.trim();if(!time.value){time.focus();return}if(!text){input.focus();return}(data.schedules[selected]??=[]).push({id:uid(),time:time.value,text});save();closeModal();renderAll()});time.focus()}else if(kind==='goal'){openModal(`${cat} に目標を追加`);const input=field('新しい目標');buttons(()=>{const text=input.value.trim();if(!text)return input.focus();(data.goals[cat]??=[]).push(text);save();closeModal();renderAll()});input.focus()}else if(kind==='music'){openMusic()}else if(kind==='wishlist'){openModal('WISHLISTに追加');const input=field('欲しいもの');input.placeholder='例：コーヒーメーカー';const wrap=node('label','field','カテゴリー'),select=node('select');WISH_CATEGORIES.forEach(c=>{const opt=node('option','',c);opt.value=c;select.append(opt)});select.value='LIFE';wrap.append(select);el('modalContent').append(wrap);buttons(()=>{const name=input.value.trim();if(!name)return input.focus();data.wishlist.push({id:uid(),name,category:select.value,created:todayKey()});save();closeModal();renderAll()});input.focus()}}
-function openWishDetail(item){openModal(item.name);const days=Math.max(0,dayDiff(item.created,todayKey()));el('modalContent').append(node('div','hint',`欲しいと思った日：${item.created.replaceAll('-','.')}`),node('div','detail-days',`${days}日`),node('p','detail-copy',days>=30?'30日経過。今も欲しいなら購入候補に。':`あと${30-days}日。30日待ってから、本当に欲しいか考える。`));const cancel=node('button','action','閉じる'),del=node('button','action danger','削除');cancel.onclick=closeModal;del.onclick=()=>{if(confirm('このWISHLISTを削除しますか？')){data.wishlist=data.wishlist.filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(cancel,del)}
+function openAdd(kind,cat){if(kind==='todo'){const key=cat||selected;openModal('TODOを追加');const input=field('やること');input.placeholder='例：写真を整理する';buttons(()=>{const text=input.value.trim();if(!text)return input.focus();ensureTodos(key).push({id:uid(),text,done:false});save();closeModal();renderAll()});input.focus();input.onkeydown=e=>{if(e.key==='Enter')el('modalActions').lastElementChild.click()}}else if(kind==='schedule'){openModal('SCHEDULEを追加');const time=field('時間（任意・空欄なら終日）','time'),input=field('予定内容');time.required=false;input.placeholder='例：家族で公園';buttons(()=>{const text=input.value.trim();if(!text){input.focus();return}(data.schedules[selected]??=[]).push({id:uid(),time:time.value,text});save();closeModal();renderAll()});time.focus()}else if(kind==='goal'){openModal(`${cat} に目標を追加`);const input=field('新しい目標');buttons(()=>{const text=input.value.trim();if(!text)return input.focus();(data.goals[cat]??=[]).push(text);save();closeModal();renderAll()});input.focus()}else if(kind==='music'){openMusic()}else if(kind==='wishlist'){openModal('WISHLISTに追加');const input=field('欲しいもの');input.placeholder='例：コーヒーメーカー';const wrap=node('label','field','カテゴリー'),select=node('select');wishCategoryNames().forEach(c=>{const opt=node('option','',c);opt.value=c;select.append(opt)});const addOption=node('option','','＋ 新しいカテゴリーを追加');addOption.value='__new_category__';select.append(addOption);select.value='LIFE';wrap.append(select);el('modalContent').append(wrap);
+const manage=node('div','wish-category-manager');
+const manageTitle=node('div','wish-manage-heading','カテゴリーを整理');
+const manageList=node('div','wish-manage-list');
+manage.append(manageTitle,manageList);el('modalContent').append(manage);
+function refreshWishCategories(){
+ const selectedValue=select.value;
+ select.replaceChildren();
+ wishCategoryNames().forEach(c=>{const opt=node('option','',c);opt.value=c;select.append(opt)});
+ const addOpt=node('option','','＋ 新しいカテゴリーを追加');addOpt.value='__new_category__';select.append(addOpt);
+ select.value=[...select.options].some(o=>o.value===selectedValue)?selectedValue:'LIFE';
+ manageList.replaceChildren();
+ data.wishCategories.filter(c=>!WISH_CATEGORIES.includes(c)).forEach(c=>{
+  const row=node('div','wish-manage-row');
+  row.append(node('span','',c));
+  const remove=node('button','category-delete','×');remove.type='button';remove.title=c+'を削除';remove.setAttribute('aria-label',c+'カテゴリーを削除');
+  remove.onclick=()=>{deleteCustomCategory('wish',c);refreshWishCategories();newWrap.hidden=select.value!=='__new_category__'};
+  row.append(remove);manageList.append(row);
+ });
+ if(!manageList.children.length)manageList.append(node('div','hint','追加したカテゴリーはまだありません'));
+}
+const newWrap=node('label','field','新しいカテゴリー名'),newInput=node('input');newInput.type='text';newInput.placeholder='例：INTERIOR';newInput.maxLength=32;newWrap.append(newInput);newWrap.hidden=true;el('modalContent').append(newWrap);refreshWishCategories();const error=node('div','hint','');el('modalContent').append(error);select.onchange=()=>{newWrap.hidden=select.value!=='__new_category__';error.textContent='';if(!newWrap.hidden)newInput.focus()};buttons(()=>{const name=input.value.trim();if(!name)return input.focus();let category=select.value;if(category==='__new_category__'){category=newInput.value.trim().replace(/\\s+/g,' ').toUpperCase();if(!category){error.textContent='カテゴリー名を入力してください。';return newInput.focus()}const existing=wishCategoryNames().find(c=>c.toUpperCase()===category);if(existing){category=existing}else{data.wishCategories.push(category)}}data.wishlist.push({id:uid(),name,category,created:todayKey()});save();closeModal();renderAll()});input.focus()}}
+function openWishDetail(item){openModal(item.name);const days=Math.max(0,dayDiff(item.created,todayKey()));el('modalContent').append(node('div','hint',`欲しいと思った日：${item.created.replaceAll('-','.')}`),node('div','detail-days',`${days}日`),node('p','detail-copy',days>=30?'30日経過。今も欲しいなら購入候補に。':`あと${30-days}日。30日待ってから、本当に欲しいか考える。`));const cancel=node('button','action','閉じる'),del=node('button','action danger','削除');cancel.onclick=closeModal;del.onclick=()=>{{data.wishlist=data.wishlist.filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(cancel,del)}
 function openBirthday(){openModal('35歳の誕生日を設定');const input=field('35歳になる日','date');input.value=data.birthday||'';buttons(()=>{if(!input.value)return input.focus();data.birthday=input.value;save();closeModal();renderAll()},'保存')}
 document.querySelectorAll('[data-view]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===btn.dataset.view));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===btn));window.scrollTo(0,0)});
 document.querySelectorAll('[data-add]').forEach(btn=>btn.onclick=()=>openAdd(btn.dataset.add,btn.dataset.today==='true'?todayKey():undefined));
@@ -160,7 +241,7 @@ data.archives??={};for(const kind of Object.keys(ARCHIVE_CONFIG)){if(!Array.isAr
 const archiveFilters={movie:'all',camp:'all',family:'all'};
 function switchPage(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));window.scrollTo(0,0)}
 function archiveKindForCategory(cat){return cat==='MOVIE'?'movie':cat==='FAMILY'?'family':cat==='OUTDOOR'?'camp':cat==='MUSIC'?'music':null}
-function addArchiveButtons(){document.querySelectorAll('#styleCategories .category').forEach((section,i)=>{const cat=Object.keys(STYLE)[i],kind=archiveKindForCategory(cat);if(!kind)return;const b=node('button','archive-link',kind==='movie'?'MOVIE JOURNAL ↗':kind==='camp'?'CAMP JOURNAL ↗':kind==='music'?'MUSIC JOURNAL ↗':'FAMILY JOURNAL ↗');b.onclick=()=>{if(kind!=='music')renderArchive(kind);switchPage(kind==='music'?'musicView':kind+'View')};section.querySelector('.category-top').after(b)})}
+function addArchiveButtons(){document.querySelectorAll('#styleCategories .category').forEach((section,i)=>{const cat=styleCategoryNames()[i],kind=archiveKindForCategory(cat);if(!kind)return;const b=node('button','archive-link',kind==='movie'?'MOVIE JOURNAL ↗':kind==='camp'?'CAMP JOURNAL ↗':kind==='music'?'MUSIC JOURNAL ↗':'FAMILY JOURNAL ↗');b.onclick=()=>{if(kind!=='music')renderArchive(kind);switchPage(kind==='music'?'musicView':kind+'View')};section.querySelector('.category-top').after(b)})}
 const originalRenderStyle=renderStyle;
 renderStyle=function(){originalRenderStyle();addArchiveButtons()};
 function selectField(label,values,initial){const wrap=node('label','field',label),select=node('select','archive-select');for(const [value,title] of values){const option=node('option','',title);option.value=value;select.append(option)}select.value=initial;wrap.append(select);el('modalContent').append(wrap);return select}
@@ -178,7 +259,7 @@ function openArchiveForm(kind,item){const c=ARCHIVE_CONFIG[kind];openModal(item?
  const list=data.archives[kind];if(item){const index=list.findIndex(x=>x.id===item.id);if(index<0)return;list[index]=record}else list.push(record);
  save();closeModal();renderArchive(kind)};
  buttons(submit,item?'保存':'追加');
- if(item){const del=node('button','action danger','削除');del.onclick=()=>{if(confirm('この記録を削除しますか？')){data.archives[kind]=data.archives[kind].filter(x=>x.id!==item.id);save();closeModal();renderArchive(kind)}};el('modalActions').append(del)}
+ if(item){const del=node('button','action danger','削除');del.onclick=()=>{{data.archives[kind]=data.archives[kind].filter(x=>x.id!==item.id);save();closeModal();renderArchive(kind)}};el('modalActions').append(del)}
  name.focus();
 }
 function renderArchive(kind){const c=ARCHIVE_CONFIG[kind],container=el(c.list);container.replaceChildren();const items=data.archives[kind];const tabs=node('div','archive-tabs');for(const [key,label] of [['all','すべて'],['wish',c.wish],['done',c.done]]){const btn=node('button','archive-tab'+(archiveFilters[kind]===key?' active':''),label);btn.onclick=()=>{archiveFilters[kind]=key;renderArchive(kind)};tabs.append(btn)}container.append(tabs);
@@ -200,13 +281,16 @@ async function allPhotoAlbums(){const db=await photoDB();return new Promise((res
 async function imageToBlob(file){if(!file.type.startsWith('image/'))throw Error('画像を選択してください');if(file.size>30*1024*1024)throw Error('30MB以下の写真を選んでください');const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();const scale=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('写真の変換に失敗しました')),'image/jpeg',.8))}finally{URL.revokeObjectURL(url)}}
 function photoImage(blob,alt){const img=node('img');img.alt=alt;const url=URL.createObjectURL(blob);img.src=url;img.onload=()=>setTimeout(()=>URL.revokeObjectURL(url),2000);img.onclick=()=>{const u=URL.createObjectURL(blob);window.open(u,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(u),60000)};return img}
 async function renderLocalGalleries(){let albums;try{albums=await allPhotoAlbums()}catch(e){for(const area of document.querySelectorAll('[data-gallery]')){area.replaceChildren(node('p','local-photo-note','この環境ではローカル写真を読み込めません：'+e.message))}return}for(const area of document.querySelectorAll('[data-gallery]')){area.replaceChildren(node('h2','','BEST 3 PHOTO ARCHIVE'));const kind=area.dataset.gallery,items=albums.filter(a=>a.kind===kind);if(!items.length){area.append(node('p','local-photo-note','写真はまだありません。記録の「BEST 3 PHOTOS」から最大3枚保存できます。'));continue}for(const album of items){const article=node('article','local-album');article.append(node('div','archive-title',album.title));const grid=node('div','local-photos');for(const blob of album.photos||[])grid.append(photoImage(blob,album.title));article.append(grid);const edit=node('button','archive-action','写真を変更する ↗');edit.onclick=()=>openLocalAlbum(kind,{id:album.id,name:album.title});article.append(edit);area.append(article)}}}
-async function openLocalAlbum(kind,item){openModal('BEST 3 PHOTOS');const message=node('p','local-photo-note','この端末のブラウザに最大3枚保存します。クラウドには送信されません。写真は長辺1600pxに縮小されます。');const pick=node('input','local-upload');pick.type='file';pick.accept='image/*';pick.multiple=true;const status=node('p','local-photo-note','');el('modalContent').append(message,pick,status);const existing=(await allPhotoAlbums().catch(()=>[])).find(a=>a.id===item.id);if(existing)status.textContent=`現在${existing.photos.length}枚保存中。新しい写真を選ぶと入れ替わります。`;const cancel=node('button','action','キャンセル');cancel.onclick=closeModal;const saveBtn=node('button','action primary','この端末に保存');saveBtn.onclick=async()=>{const files=[...pick.files];if(files.length<1||files.length>3){status.textContent='写真を1〜3枚選んでください。';return}saveBtn.disabled=true;status.textContent='写真を保存しています…';try{const photos=[];for(const f of files)photos.push(await imageToBlob(f));await photoTransaction('readwrite',store=>store.put({id:item.id,kind,title:item.name,photos,updated:todayKey()}));closeModal();await renderLocalGalleries()}catch(e){status.textContent='保存に失敗しました：'+e.message+'（ブラウザの空き容量や保存設定を確認してください）'}finally{saveBtn.disabled=false}};el('modalActions').append(cancel,saveBtn);if(existing){const del=node('button','action danger','写真を削除');del.onclick=async()=>{if(!confirm('この記録の写真をすべて削除しますか？'))return;await photoTransaction('readwrite',store=>store.delete(item.id));closeModal();renderLocalGalleries()};el('modalActions').append(del)}}
+async function openLocalAlbum(kind,item){openModal('BEST 3 PHOTOS');const message=node('p','local-photo-note','この端末のブラウザに最大3枚保存します。クラウドには送信されません。写真は長辺1600pxに縮小されます。');const pick=node('input','local-upload');pick.type='file';pick.accept='image/*';pick.multiple=true;const status=node('p','local-photo-note','');el('modalContent').append(message,pick,status);const existing=(await allPhotoAlbums().catch(()=>[])).find(a=>a.id===item.id);if(existing)status.textContent=`現在${existing.photos.length}枚保存中。新しい写真を選ぶと入れ替わります。`;const cancel=node('button','action','キャンセル');cancel.onclick=closeModal;const saveBtn=node('button','action primary','この端末に保存');saveBtn.onclick=async()=>{const files=[...pick.files];if(files.length<1||files.length>3){status.textContent='写真を1〜3枚選んでください。';return}saveBtn.disabled=true;status.textContent='写真を保存しています…';try{const photos=[];for(const f of files)photos.push(await imageToBlob(f));await photoTransaction('readwrite',store=>store.put({id:item.id,kind,title:item.name,photos,updated:todayKey()}));closeModal();await renderLocalGalleries()}catch(e){status.textContent='保存に失敗しました：'+e.message+'（ブラウザの空き容量や保存設定を確認してください）'}finally{saveBtn.disabled=false}};el('modalActions').append(cancel,saveBtn);if(existing){const del=node('button','action danger','写真を削除');del.onclick=async()=>{await photoTransaction('readwrite',store=>store.delete(item.id));closeModal();renderLocalGalleries()};el('modalActions').append(del)}}
 renderAll();
 </script>
 <script>
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline cache unavailable', err)));
 }
+
+document.getElementById('addStyleCategory').addEventListener('click',()=>addCategory('style'));
+
 </script>
 </body>
 </html>
