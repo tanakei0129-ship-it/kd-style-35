@@ -50,6 +50,8 @@ html,body{background:var(--bg)}body{font-family:Arial,"Hiragino Kaku Gothic ProN
 .category-add{display:block;width:100%;padding:17px;margin:20px 0 8px;border:1px dashed var(--blue);border-radius:8px;background:transparent;color:var(--blue);font-weight:800;text-align:center;letter-spacing:.05em}.category-add:active{background:#e7eefa}
 .category-delete{border:1px solid #c9c7c0;background:transparent;border-radius:50%;color:#777;font-size:18px;line-height:1;width:30px;height:30px;min-width:30px;cursor:pointer;margin-left:auto}.category-delete:active{background:#eee;color:#222}
 .wish-category-manager{margin:12px 0;padding:12px;border:1px solid #d6d2c9;border-radius:8px}.wish-manage-heading{font-weight:800;color:var(--blue);font-size:13px;margin-bottom:8px}.wish-manage-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #e7e4dc}.wish-manage-row:last-child{border-bottom:0}.wish-manage-row .category-delete{margin-left:auto}
+.goal{display:flex;align-items:center;gap:10px}.goal>span{flex:1;min-width:0;overflow-wrap:anywhere}.goal-delete{flex:none;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #d5d2c9;border-radius:50%;background:transparent;color:#777;font-size:19px;line-height:1;cursor:pointer}.goal-delete:active{background:#eae7df;color:#222}
+.style-category-editor-list{margin-top:18px;border-top:1px solid #d6d2c9;padding-top:12px}.style-category-editor-heading{font-size:12px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-bottom:8px}.style-category-editor-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e5e1d8;font-weight:700}
 </style>
 <script>
 // Prevent accidental pinch zoom in the installed iPhone app while preserving normal scrolling.
@@ -73,7 +75,7 @@ document.addEventListener('gesturechange', event => event.preventDefault(), {pas
 <p class="hint">日付を選んで、下の＋から予定を登録できます。登録した予定は日付にドットで表示されます。</p><div class="section-head"><div class="section-title">SCHEDULE</div><button class="plus" data-add="schedule" aria-label="予定を追加">+</button></div><div class="list" id="scheduleList"></div>
 <div class="section-head" style="margin-top:36px"><div class="section-title">TODO</div><button class="plus" data-add="todo" aria-label="TODOを追加">+</button></div><div class="list" id="calendarTodoList"></div>
 </section>
-<section class="view" id="styleView"><div class="page-kicker">03 / THE INDEX</div><h1 class="view-title">MY STYLE</h1><div id="styleCategories"></div><button class="category-add" id="addStyleCategory" type="button">＋ カテゴリーを追加</button></section>
+<section class="view" id="styleView"><div class="page-kicker">03 / THE INDEX</div><h1 class="view-title">MY STYLE</h1><div id="styleCategories"></div><button class="category-add" id="addStyleCategory" type="button">カテゴリーを編集</button></section>
 <section class="view" id="wishlistView"><div class="page-kicker">04 / THE COLLECTION</div><div class="section-head" style="margin-top:0"><h1 class="view-title" style="margin:0">WISHLIST</h1><button class="plus" data-add="wishlist" aria-label="欲しいものを追加">+</button></div><p class="hint" style="margin-bottom:30px">本当に欲しいものだけを選ぶ、30日間のリスト。</p><div id="wishlistCategories"></div></section>
 <section class="view" id="musicView"><button class="archive-back" data-back-style>← STYLEへ戻る</button><div class="page-kicker">05 / SOUNDTRACK OF MY LIFE</div><div class="section-head" style="margin-top:0"><h1 class="view-title" style="margin:0">MUSIC.</h1><button class="plus" data-add="music" aria-label="音楽を記録">+</button></div><p class="hint" style="margin-bottom:26px">SOUNDTRACK OF MY LIFE<br>その頃の自分を、音楽で思い出す。</p><div id="musicList"></div></section>
 
@@ -99,7 +101,7 @@ function todayKey(){return dateKey(new Date())}
 function dayDiff(start,end){const a=fromKey(start),b=fromKey(end);return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000)}
 function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()}
 function readData(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&typeof v==='object'?v:{}}catch{return {}}}
-const data=readData();data.todos??={};data.schedules??={};data.goals??=structuredClone(STYLE);data.wishlist??=[];data.music??=[];data.birthday??='';data.weeklyTodos??=null;data.weeklyChecks??={};data.dailyHabits??=null;data.skippedHabits??={};data.styleCategories??=[];data.wishCategories??=[];
+const data=readData();data.todos??={};data.schedules??={};data.goals??=structuredClone(STYLE);data.wishlist??=[];data.music??=[];data.birthday??='';data.weeklyTodos??=null;data.weeklyChecks??={};data.dailyHabits??=null;data.skippedHabits??={};data.styleCategories??=[];data.wishCategories??=[];data.hiddenStyleCategories??=[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch{alert('保存できませんでした。ブラウザの保存設定を確認してください。')}}
 let selected=todayKey(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 function ensureHabits(){
@@ -159,7 +161,7 @@ function openScheduleEdit(item){openModal('予定を編集');const time=field('�
 function musicFields(item){const song=field('曲名'),artist=field('アーティスト'),date=field('記録する日','date');song.value=item?.song||'';artist.value=item?.artist||'';date.value=item?.date||todayKey();const wrap=node('label','field','その頃の気分・思い出（任意）'),note=node('textarea');note.value=item?.note||'';note.placeholder='例：朝の散歩で何度も聴いていた';wrap.append(note);el('modalContent').append(wrap);const link=field('音楽へのリンク（任意）','url');link.required=false;link.value=item?.link||'';link.placeholder='https://...';return {song,artist,date,note,link}}
 function openMusic(item){openModal(item?'音楽の記録を編集':'音楽を記録');const f=musicFields(item);buttons(()=>{if(!f.song.value.trim())return f.song.focus();if(!f.artist.value.trim())return f.artist.focus();if(!f.date.value)return f.date.focus();const record={id:item?.id||uid(),song:f.song.value.trim(),artist:f.artist.value.trim(),date:f.date.value,note:f.note.value.trim(),link:f.link.value.trim()};if(item){const idx=data.music.findIndex(x=>x.id===item.id);if(idx>=0)data.music[idx]=record}else data.music.push(record);save();closeModal();renderAll()},item?'保存':'追加');if(item){const del=node('button','action danger','削除');del.onclick=()=>{{data.music=data.music.filter(x=>x.id!==item.id);save();closeModal();renderAll()}};el('modalActions').append(del)}f.song.focus()}
 function renderMusic(){const box=el('musicList');box.replaceChildren();const records=[...data.music].sort((a,b)=>b.date.localeCompare(a.date));if(!records.length){empty(box,'まだ音楽の記録はありません。＋から好きな曲を残しましょう。');return}let previous='';records.forEach(item=>{const month=item.date.slice(0,7);if(month!==previous){previous=month;const heading=node('div','section-title',month.replace('-',' / '));heading.style.marginTop='28px';box.append(heading)}const row=node('article','music-entry');row.append(node('div','music-date',item.date.replaceAll('-','.')),node('div','music-song',item.song),node('div','music-artist',item.artist));if(item.note)row.append(node('p','music-note',item.note));const actions=node('div','music-actions'),edit=node('button','','編集');edit.onclick=()=>openMusic(item);actions.append(edit);if(item.link&&/^https?:\/\//i.test(item.link)){const link=node('a','','曲を開く ↗');link.href=item.link;link.target='_blank';link.rel='noopener noreferrer';actions.append(link)}row.append(actions);box.append(row)})}
-function styleCategoryNames(){return [...new Set([...Object.keys(STYLE),...data.styleCategories,...Object.keys(data.goals)])]}
+function styleCategoryNames(){return [...new Set([...Object.keys(STYLE),...data.styleCategories,...Object.keys(data.goals)])].filter(cat=>!data.hiddenStyleCategories.includes(cat))}
 function wishCategoryNames(){return [...new Set([...WISH_CATEGORIES,...data.wishCategories,...data.wishlist.map(x=>x.category).filter(Boolean)])]}
 function addCategory(kind){
  const isStyle=kind==='style',existing=isStyle?styleCategoryNames():wishCategoryNames();
@@ -174,15 +176,12 @@ function addCategory(kind){
 }
 function deleteCustomCategory(kind,cat){
  if(kind==='style'){
-  if(!data.styleCategories.includes(cat))return;
-  const goals=data.goals[cat]||[];
-  if(goals.length){
-   const target='UNCATEGORIZED';
-   if(!data.styleCategories.includes(target)&&!Object.hasOwn(STYLE,target))data.styleCategories.push(target);
-   (data.goals[target]??=[]).push(...goals);
-  }
-  delete data.goals[cat];
+  if(!styleCategoryNames().includes(cat))return;
+  // Keep a hidden marker for built-in categories so they stay deleted on reload.
+  if(!data.hiddenStyleCategories.includes(cat))data.hiddenStyleCategories.push(cat);
   data.styleCategories=data.styleCategories.filter(c=>c!==cat);
+  // Delete goals belonging to the category; other journals remain independent.
+  delete data.goals[cat];
  }else{
   if(!data.wishCategories.includes(cat))return;
   data.wishlist.forEach(item=>{if(item.category===cat)item.category='LIFE'});
@@ -196,7 +195,49 @@ function categoryDeleteButton(kind,cat){
  b.onclick=()=>deleteCustomCategory(kind,cat);
  return b;
 }
-function renderStyle(){const box=el('styleCategories');box.replaceChildren();styleCategoryNames().forEach(cat=>{const section=node('section','category'),head=node('div','category-top'),title=node('div','category-name',cat),plus=node('button','plus','+');plus.setAttribute('aria-label',`${cat}に目標を追加`);plus.onclick=()=>openAdd('goal',cat);head.append(title);if(data.styleCategories.includes(cat)&&cat!=='UNCATEGORIZED')head.append(categoryDeleteButton('style',cat));head.append(plus);section.append(head);(data.goals[cat]||[]).forEach(goal=>{const row=node('div','goal');row.append(node('span','',goal));section.append(row)});box.append(section)})}
+function openStyleCategoryEditor(){
+ openModal('STYLE カテゴリーを編集');
+ const content=el('modalContent');
+ const note=node('p','hint','現在のカテゴリーを追加・削除できます。×で削除すると一覧から完全に消え、再表示リストは作りません。カテゴリー内の目標も削除されます。');
+ content.append(note);
+ const input=field('新しいカテゴリー名');
+ input.placeholder='例：TRAVEL';input.maxLength=32;
+ const error=node('p','hint','');content.append(error);
+ const add=node('button','action primary','＋ カテゴリーを追加');
+ const list=node('div','style-category-editor-list');
+ content.append(add,list);
+ function refresh(){
+  list.replaceChildren();
+  list.append(node('div','style-category-editor-heading','現在表示中のカテゴリー'));
+  const current=styleCategoryNames();
+  if(!current.length)list.append(node('p','hint','現在表示中のカテゴリーはありません。'));
+  current.forEach(cat=>{
+   const row=node('div','style-category-editor-row');
+   row.append(node('span','',cat));
+   const del=node('button','category-delete','×');
+   del.type='button';del.title=cat+'を削除';del.setAttribute('aria-label',cat+'カテゴリーを削除');
+   del.onclick=()=>{deleteCustomCategory('style',cat);refresh()};
+   row.append(del);list.append(row);
+  });
+
+ }
+ function addNew(){
+  const name=input.value.trim().replace(/\\s+/g,' ').toUpperCase();
+  if(!name){input.focus();return}
+  if(styleCategoryNames().some(cat=>cat.toUpperCase()===name)){error.textContent='同じ名前のカテゴリーがすでにあります。';return}
+  // A name can be created again, but it starts with an empty goal list.
+  data.hiddenStyleCategories=data.hiddenStyleCategories.filter(cat=>cat.toUpperCase()!==name);
+  if(!Object.hasOwn(STYLE,name)&&!data.styleCategories.includes(name))data.styleCategories.push(name);
+  data.goals[name]=[];
+  save();renderAll();
+  input.value='';error.textContent='';refresh();input.focus();
+ }
+ add.onclick=addNew;input.onkeydown=e=>{if(e.key==='Enter')addNew()};
+ const close=node('button','action','閉じる');close.onclick=closeModal;
+ el('modalActions').append(close);
+ refresh();
+}
+function renderStyle(){const box=el('styleCategories');box.replaceChildren();styleCategoryNames().forEach(cat=>{const section=node('section','category'),head=node('div','category-top'),title=node('div','category-name',cat),plus=node('button','plus','+');plus.setAttribute('aria-label',`${cat}に目標を追加`);plus.onclick=()=>openAdd('goal',cat);head.append(title);head.append(plus);section.append(head);(data.goals[cat]||[]).forEach((goal,index)=>{const row=node('div','goal');row.append(node('span','',goal));const remove=node('button','goal-delete','×');remove.type='button';remove.title='目標を削除';remove.setAttribute('aria-label',`${goal}を削除`);remove.onclick=()=>{data.goals[cat].splice(index,1);save();renderStyle()};row.append(remove);section.append(row)});box.append(section)})}
 function renderWishlist(){const box=el('wishlistCategories');box.replaceChildren();let any=false;wishCategoryNames().forEach(cat=>{const items=data.wishlist.filter(x=>x.category===cat);const custom=data.wishCategories.includes(cat);if(!items.length&&!custom)return;any=true;const section=node('section','category');const head=node('div','category-top');head.append(node('div','category-name',cat));section.append(head);items.forEach(item=>{const btn=node('button','wish-row');btn.append(node('div','wish-name','○ '+item.name),node('div','wish-meta',`WANTED ${item.created.replaceAll('-','.')} · ${Math.max(0,dayDiff(item.created,todayKey()))} DAYS`));btn.onclick=()=>openWishDetail(item);section.append(btn)});if(!items.length)section.append(node('div','hint','まだ登録はありません'));box.append(section)});if(!any)empty(box,'欲しいものはまだありません。＋から追加しましょう。')}
 function renderAll(){renderHome();renderCalendar();renderStyle();renderWishlist();renderMusic()}
 function closeModal(){el('overlay').hidden=true;el('modalContent').replaceChildren();el('modalActions').replaceChildren()}
@@ -289,7 +330,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('Offline cache unavailable', err)));
 }
 
-document.getElementById('addStyleCategory').addEventListener('click',()=>addCategory('style'));
+document.getElementById('addStyleCategory').addEventListener('click',openStyleCategoryEditor);
 
 </script>
 </body>
